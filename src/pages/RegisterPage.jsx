@@ -102,11 +102,7 @@ const RegisterPage = ({ onRegister, onNavigate }) => {
               className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-cyan-500" 
               disabled={loading}
             >
-              <option value="NET-401">NET-401</option>
-              <option value="NET-402">NET-402</option>
-              <option value="NET-403">NET-403</option>
-              <option value="2444">2444</option>
-              <option value="2445">2445</option>
+              <option value="3330">3330</option>
             </select>
           </div>
 
