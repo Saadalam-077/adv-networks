@@ -55,7 +55,7 @@ const HomePage = ({ user, onNavigate, onLogout }) => {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <a href="https://t.me/+B2zs30x2p9dhNzRk" target="_blank" rel="noopener noreferrer" className="block mb-8 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-2xl p-4 hover:from-blue-500 hover:to-cyan-500 transition-all shadow-lg shadow-blue-600/20">
+        <a href="https://t.me/+JUZvIGojIlUxYjVk" target="_blank" rel="noopener noreferrer" className="block mb-8 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-2xl p-4 hover:from-blue-500 hover:to-cyan-500 transition-all shadow-lg shadow-blue-600/20">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
