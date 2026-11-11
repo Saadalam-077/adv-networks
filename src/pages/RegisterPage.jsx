@@ -25,8 +25,8 @@ const RegisterPage = ({ onRegister, onNavigate }) => {
       setError('Student number must be between 6 and 12 digits | الرقم الجامعي يجب أن يكون بين 6 و 12 رقماً');
       return;
     }
-    if (form.password.length < 4) {
-      setError('Password must be at least 4 characters | كلمة المرور يجب أن تكون 4 أحرف على الأقل');
+    if (form.password.length < 8) {
+      setError('Password must be at least 8 characters | كلمة المرور يجب ألا تقل عن 8 أحرف');
       return;
     }
 

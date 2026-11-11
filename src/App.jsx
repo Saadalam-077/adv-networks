@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { loginStudent, registerStudent, updateStudentProgress } from './dbService';
+import { loginStudent, registerStudent, updateStudentProgress, resetStudentPassword } from './dbService';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import RecoveryPage from './pages/RecoveryPage';
 import HomePage from './pages/HomePage';
 import ProfilePage from './pages/ProfilePage';
 import AdminDashboard from './pages/AdminDashboard';
@@ -146,6 +147,7 @@ function App() {
 
   if (currentPage === 'login') return <LoginPage onLogin={handleLogin} onNavigate={handleNavigate} />;
   if (currentPage === 'register') return <RegisterPage onRegister={handleRegister} onNavigate={handleNavigate} />;
+  if (currentPage === 'recover') return <RecoveryPage onRecover={resetStudentPassword} onNavigate={handleNavigate} />;
   if (currentPage === 'admin' && user?.isAdmin) return <AdminDashboard onLogout={handleLogout} />;
   if (currentPage === 'home' && user) return <HomePage user={user} onNavigate={handleNavigate} onLogout={handleLogout} />;
   if (currentPage === 'profile' && user) return <ProfilePage user={user} onNavigate={handleNavigate} onLogout={handleLogout} />;
