@@ -25,23 +25,19 @@ const TABLE_CANDIDATES = ['network_students', 'adv_network_students', 'net_stude
 let activeTable = 'network_students';
 
 export async function loginStudent(studentNumber, password) {
-  // Try table candidates in order
-  for (const table of TABLE_CANDIDATES) {
-    try {
-      const { data, error } = await supabase
-        .from(table)
-        .select('*')
-        .eq('student_number', studentNumber)
-        .eq('password', password)
-        .single();
-
-      if (!error && data) {
-        activeTable = table;
-        return { success: true, student: data };
-      }
-    } catch (e) {
-      // continue to next table
+  // Password is checked inside the database, trying the course tables in order.
+  try {
+    const { data, error } = await supabase.rpc('net_student_login', {
+      p_student_number: studentNumber.trim(),
+      p_password: password
+    });
+    if (!error && data?.success) {
+      activeTable = data.source || 'network_students';
+      return { success: true, student: data };
     }
+    if (error) console.warn('Supabase login failed, attempting local fallback', error);
+  } catch (e) {
+    console.warn('Supabase login failed, attempting local fallback', e);
   }
 
   // Fallback to local storage
@@ -71,32 +67,23 @@ export async function registerStudent(formData) {
     return { success: false, message: 'Student number already registered | الرقم الجامعي مسجل مسبقاً' };
   }
 
-  // Try inserting into primary candidate tables
-  for (const table of TABLE_CANDIDATES) {
-    try {
-      const { data: existing } = await supabase
-        .from(table)
-        .select('id')
-        .eq('student_number', formData.studentNumber)
-        .single();
-
-      if (existing) {
-        return { success: false, message: 'Student number already registered in Supabase' };
+  try {
+    const { data, error } = await supabase.rpc('net_register_student', {
+      p_student_name: formData.studentName.trim(),
+      p_student_number: formData.studentNumber.trim(),
+      p_section_number: formData.sectionNumber,
+      p_password: formData.password
+    });
+    if (!error) {
+      if (!data?.success) {
+        return { success: false, message: 'Student number already registered | الرقم الجامعي مسجل مسبقاً' };
       }
-
-      const { data, error } = await supabase
-        .from(table)
-        .insert([newStudent])
-        .select()
-        .single();
-
-      if (!error && data) {
-        activeTable = table;
-        return { success: true, student: data };
-      }
-    } catch (e) {
-      // continue trying other tables
+      activeTable = 'network_students';
+      return { success: true, student: data.student };
     }
+    console.warn('Supabase registration failed, falling back to local storage', error);
+  } catch (e) {
+    console.warn('Supabase registration failed, falling back to local storage', e);
   }
 
   // Fallback to local storage
@@ -142,10 +129,17 @@ export async function fetchAllStudents() {
 
   for (const table of TABLE_CANDIDATES) {
     try {
-      const { data, error } = await supabase
+      // Password columns are not readable from the browser, so list columns explicitly.
+      let { data, error } = await supabase
         .from(table)
-        .select('*')
+        .select('id, student_name, student_number, section_number, progress, total_score, overall_grade')
         .order('student_name');
+      if (error) {
+        ({ data, error } = await supabase
+          .from(table)
+          .select('id, student_name, student_number, section_number, progress')
+          .order('student_name'));
+      }
 
       if (!error && data && data.length > 0) {
         activeTable = table;
@@ -200,4 +194,17 @@ export async function resetStudentRecordProgress(id) {
     locals[idx].overall_grade = 'N/A';
     saveLocalStudents(locals);
   }
+}
+
+export async function resetStudentPassword(studentNumber, recoveryCode, newPassword) {
+  const { data, error } = await supabase.rpc('net_reset_student_password', {
+    p_student_number: studentNumber.trim(),
+    p_recovery_code: recoveryCode.trim(),
+    p_new_password: newPassword
+  });
+  if (error) {
+    console.error('Password recovery error:', error);
+    return false;
+  }
+  return data === true;
 }
